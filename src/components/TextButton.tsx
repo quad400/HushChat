@@ -28,7 +28,7 @@ const TextButton = ({
         alignItems: 'center',
       }}>
       {loading ? (
-        <ActivityIndicator color={Colors.light.tint} />
+        <ActivityIndicator color={Colors.light.background} />
       ) : (
         <Text
           style={{

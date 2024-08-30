@@ -4,16 +4,38 @@ import {OtpInput} from 'react-native-otp-entry';
 import Sizes from '../../constants/Sizes';
 import {Colors} from '../../constants/Colors';
 import {View} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from '@react-navigation/native';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import Fonts from '../../constants/Fonts';
 import {useState} from 'react';
 import TextButton from '../../components/TextButton';
+import {useAppDispatch, useAppSelector} from '../../hooks/useRedux';
+import {OtpDispatch} from '../../features/user';
+import Message from '../../components/Message';
 
-const Otp = () => {
-  const navigation = useNavigation<any>();
+const Otp = ({route}: any) => {
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
 
   const [code, setCode] = useState('');
+  const dispatch = useAppDispatch();
+
+  const {email} = route.params;
+
+  const {message, loading} = useAppSelector(state => state.user);
+
+  const is_disabled = code === '';
+
+  const activate = () => {
+    const body = {
+      code,
+      email,
+    };
+    dispatch(OtpDispatch({body, navigation}));
+  };
 
   return (
     <>
@@ -26,6 +48,8 @@ const Otp = () => {
           paddingHorizontal: Sizes.Medium,
           paddingTop: Sizes.Large,
         }}>
+        {message && <Message message={message} />}
+
         <View
           style={{
             flex: 4,
@@ -105,7 +129,7 @@ const Otp = () => {
               }}>
               Resend Code
             </Text>
-            </Pressable>
+          </Pressable>
         </View>
 
         <View
@@ -113,8 +137,10 @@ const Otp = () => {
             flex: 1,
           }}>
           <TextButton
-            onPress={() => navigation.navigate('UpdateProfile')}
+            onPress={activate}
             label="Confirm"
+            disabled={is_disabled}
+            loading={loading}
           />
         </View>
       </SafeAreaView>

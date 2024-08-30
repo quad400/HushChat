@@ -1,19 +1,17 @@
-// useChatClient.js
-
 import { useCallback, useEffect, useState } from "react";
 import { StreamChat } from "stream-chat";
 import { chatApiKey } from "../constants/Env";
-import { useAuth } from "../providers/AuthProvider";
+import { useAppSelector } from "./useRedux";
 
 export const chatClient = StreamChat.getInstance("nmaqz86rddhu");
 
 export const useChatClient = () => {
   const [clientIsReady, setClientIsReady] = useState(false);
 
-  const { user, chat_token } = useAuth();
+  const { user } = useAppSelector(state=> state.user);
 
   const setupClient = useCallback(async () => {
-    if (!user || !chat_token) return;
+    if (!user) return;
     console.log("Setting up chat client");
     try {
       await chatClient.connectUser(
@@ -22,7 +20,7 @@ export const useChatClient = () => {
           name: user.fullName,
           image: user.avatar,
         },
-        chat_token
+        user.chatToken
       );
       setClientIsReady(true);
       console.log("Chat client connected");
@@ -33,7 +31,7 @@ export const useChatClient = () => {
         );
       }
     }
-  }, [user, chat_token]);
+  }, [user]);
 
   useEffect(() => {
     setupClient();

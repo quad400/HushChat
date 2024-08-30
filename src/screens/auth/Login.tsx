@@ -9,6 +9,10 @@ import Fonts from '../../constants/Fonts';
 import TextButton from '../../components/TextButton';
 import CustomInput from '../../components/CustomInput';
 import {useState} from 'react';
+import Message from '../../components/Message';
+import {useAppDispatch, useAppSelector} from '../../hooks/useRedux';
+import {LoginDispatch} from '../../features/user';
+import {LoginType} from '../../types';
 
 const Login = () => {
   const navigation = useNavigation<any>();
@@ -19,6 +23,19 @@ const Login = () => {
   const [secure, setSecure] = useState<boolean>(true);
   const [isFocused, setisFocused] = useState(false);
 
+  const {message, loading} = useAppSelector(state => state.user);
+
+  const dispatch = useAppDispatch();
+  const is_disabled = email === '' || password === '' || loading;
+
+  const signIn = () => {
+    const body = {
+      email,
+      password,
+    } as LoginType;
+    dispatch(LoginDispatch({body, navigation}));
+  };
+
   return (
     <SafeAreaView
       style={{
@@ -28,6 +45,8 @@ const Login = () => {
         paddingHorizontal: Sizes.Medium,
         paddingTop: Sizes.Large,
       }}>
+      {message && <Message message={message} />}
+
       <View
         style={{
           flex: 4,
@@ -117,7 +136,7 @@ const Login = () => {
             justifyContent: 'center',
             marginTop: Sizes.Small,
             alignItems: 'center',
-            gap: 10
+            gap: 10,
           }}>
           <Text
             style={{
@@ -144,8 +163,10 @@ const Login = () => {
           flex: 1,
         }}>
         <TextButton
+          disabled={is_disabled}
+          loading={loading}
           label="Continue"
-          onPress={() => navigation.navigate('Otp')}
+          onPress={signIn}
         />
       </View>
     </SafeAreaView>

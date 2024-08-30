@@ -16,7 +16,7 @@ export const Colors = {
     primary: primary,
     border: "#CFCFCF",
     tint: tintColorLight,
-    input: "#8a8888",
+    input: "#F7F6F7",
     icon: '#687076',
     tabIconDefault: '#687076',
     tabIconSelected: tintColorLight,

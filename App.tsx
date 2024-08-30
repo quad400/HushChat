@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {StreamChat} from 'stream-chat';
@@ -15,32 +8,40 @@ import {
 import {colors, theme} from './src/theme';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Chat, OverlayProvider, ThemeProvider} from 'stream-chat-react-native';
-import AuthProvider from './src/providers/AuthProvider';
+import {Provider} from 'react-redux';
 import {useChatClient} from './src/hooks/useChatClient';
 import RootStack from './src/stack/RootStack';
-import SplashScreen from 'react-native-splash-screen'
+import SplashScreen from 'react-native-splash-screen';
+import {store} from './src/features/store';
+import {useAppDispatch} from './src/hooks/useRedux';
+import {
+  GetUserDispatch,
+  TokenDispatch,
+  UserDispatch,
+} from './src/features/user';
 
 export const chatClient = StreamChat.getInstance('nmaqz86rddhu');
 
+SplashScreen.hide();
 const App = () => {
-  const {bottom} = useSafeAreaInsets();
-  const [clientReady, setClientReady] = useState<boolean>(false);
-
   useChatClient();
-
-  useEffect(()=> {
-    SplashScreen.hide()
-  }, [])
+  
+  const {bottom} = useSafeAreaInsets();
+  
+  useEffect(() => {
+    store.dispatch(TokenDispatch());
+    store.dispatch(UserDispatch());
+  }, [store.dispatch]);
 
   return (
-    <NavigationContainer theme={theme}>
+    <NavigationContainer>
       <GestureHandlerRootView style={{flex: 1}}>
         <OverlayProvider bottomInset={bottom} value={{style: theme}}>
-        <ThemeProvider style={theme}>
-          <Chat client={chatClient} enableOfflineSupport>
-          <RootStack />
-          </Chat>
-        </ThemeProvider>
+          <ThemeProvider style={theme}>
+            <Chat client={chatClient}>
+              <RootStack />
+            </Chat>
+          </ThemeProvider>
         </OverlayProvider>
       </GestureHandlerRootView>
     </NavigationContainer>
@@ -50,9 +51,9 @@ const App = () => {
 export default () => {
   return (
     <SafeAreaProvider>
-      <AuthProvider>
+      <Provider store={store}>
         <App />
-      </AuthProvider>
+      </Provider>
     </SafeAreaProvider>
   );
 };

@@ -19,16 +19,7 @@ export const signIn = async (email: string, password: string) => {
   }
 };
 
-export const signUp = async (email: string, password: string) => {
-  try {
-    await axios.post(`${baseUrl}/auth/register`, {
-      email,
-      password,
-    });
-  } catch (error: any) {
-    console.log(error.response.data);
-  }
-};
+
 
 export async function fetchProfile({userToken}: {userToken: string | null}) {
   try {
@@ -40,6 +31,6 @@ export async function fetchProfile({userToken}: {userToken: string | null}) {
     console.log(data);
     // setProfile(data);
   } catch (error: any) {
-    console.log(error.response.data);
+    throw new Error(error.response.data.message)
   }
 }

@@ -9,27 +9,36 @@ import Fonts from '../../constants/Fonts';
 import TextButton from '../../components/TextButton';
 import CustomInput from '../../components/CustomInput';
 import {useState} from 'react';
-import {signUp} from '../../lib/auth';
+import {baseUrl} from '../../constants/Env';
+import axios from 'axios';
+import Message from '../../components/Message';
+import { RegisterType } from '../../types';
+import { RegisterDispatch } from '../../features/user';
+import { useAppDispatch, useAppSelector } from '../../hooks/useRedux';
 
 const Register = () => {
   const navigation = useNavigation<any>();
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-
+  const [fullName, setFullName] = useState<string>('');
+  
+  const {loading, message} = useAppSelector((state)=> state.user)
+  const dispatch = useAppDispatch()
   const [secure, setSecure] = useState<boolean>(true);
   const [isFocused, setIsFocused] = useState(false);
-  const [loading, setLoading] = useState(false);
+  
 
   const is_disabled = email === '' || password === '' || loading;
 
-  const handleRegister = async () => {
-    setLoading(true);
-    await signUp(email, password)
-      .then(() => navigation.navigate('Otp'))
-      .finally(() => {
-        setLoading(false);
-      });
+
+  const signUp = () => {
+    const body = {
+      email,
+      password,
+      fullName
+    } as RegisterType;
+    dispatch(RegisterDispatch({body, navigation}));
   };
 
   return (
@@ -41,6 +50,7 @@ const Register = () => {
         paddingHorizontal: Sizes.Medium,
         paddingTop: Sizes.Large,
       }}>
+      {message && <Message message={message} />}
       <View
         style={{
           flex: 4,
@@ -76,6 +86,12 @@ const Register = () => {
           onChangeText={setEmail}
           value={email}
           keyboardType="email-address"
+        />
+
+        <CustomInput
+          placeholder="FullName"
+          onChangeText={setFullName}
+          value={fullName}
         />
 
         <View
@@ -162,7 +178,7 @@ const Register = () => {
           disabled={is_disabled}
           loading={loading}
           label="Continue"
-          onPress={handleRegister}
+          onPress={signUp}
         />
       </View>
     </SafeAreaView>
